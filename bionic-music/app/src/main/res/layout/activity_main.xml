@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/vantablack">
+
+    <!-- Fragment host -->
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/vantablack" />
+
+    <!-- Mini player anchored at bottom -->
+    <include
+        android:id="@+id/mini_player"
+        layout="@layout/view_mini_player"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/mini_player_height"
+        android:layout_gravity="bottom" />
+
+    <!-- Full player slides up over everything -->
+    <FrameLayout
+        android:id="@+id/player_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/vantablack"
+        android:visibility="gone" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

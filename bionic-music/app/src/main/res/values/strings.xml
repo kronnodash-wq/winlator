@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Bionic Music</string>
+    <string name="powered_by">Powered by kronnodash</string>
+
+    <!-- Main menu -->
+    <string name="modo_online">Modo Online</string>
+    <string name="modo_offline">Modo Offline</string>
+    <string name="ecualizador">Ecualizador</string>
+
+    <!-- Sort bar -->
+    <string name="sort_name">Nombre</string>
+    <string name="shuffle">Aleatorio</string>
+    <string name="play_all">Reproducir todo</string>
+
+    <!-- Local song menu -->
+    <string name="eliminar">Eliminar</string>
+    <string name="compartir">Compartir</string>
+    <string name="definir_como">Definir como</string>
+    <string name="tono">Tono</string>
+    <string name="alarma">Alarma</string>
+
+    <!-- Online song menu -->
+    <string name="descargar_musica">Descargar música</string>
+    <string name="formato">Formato</string>
+    <string name="formato_mp3">MP3</string>
+    <string name="formato_flac">FLAC</string>
+
+    <!-- Player -->
+    <string name="search_hint">Buscar canciones, artistas…</string>
+    <string name="search_online_hint">Buscar música online…</string>
+    <string name="now_playing">Reproduciendo</string>
+    <string name="queue">Cola</string>
+    <string name="lyrics">Letras</string>
+    <string name="volumen">Volumen</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_search">Buscar</string>
+    <string name="cd_menu">Menú</string>
+    <string name="cd_album_art">Carátula</string>
+    <string name="cd_play">Reproducir</string>
+    <string name="cd_pause">Pausar</string>
+    <string name="cd_next">Siguiente</string>
+    <string name="cd_prev">Anterior</string>
+    <string name="cd_shuffle">Aleatorio</string>
+    <string name="cd_queue">Cola</string>
+    <string name="cd_close">Cerrar</string>
+    <string name="cd_lyrics">Letras</string>
+    <string name="cd_eq">Ecualizador</string>
+    <string name="cd_mute">Silenciar</string>
+
+    <!-- Notification -->
+    <string name="channel_playback">Reproducción</string>
+    <string name="channel_download">Descargas</string>
+    <string name="downloading">Descargando</string>
+    <string name="download_complete">Descarga completada</string>
+    <string name="download_failed">Error en la descarga</string>
+
+    <!-- Album -->
+    <string name="songs_count">%1$d canciones</string>
+
+    <string name="no_songs">No se encontraron canciones</string>
+    <string name="permission_needed">Se necesita permiso para acceder a la música</string>
+</resources>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+
+    <!-- Note head as a circle filled with the Paraguay flag (clipped to circle) -->
+    <group>
+        <clip-path android:pathData="M22,76 m-24,0 a24,24 0 1,0 48,0 a24,24 0 1,0 -48,0z" />
+        <path
+            android:fillColor="#D52B1E"
+            android:pathData="M-4,52 L48,52 L48,68 L-4,68 Z" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M-4,68 L48,68 L48,84 L-4,84 Z" />
+        <path
+            android:fillColor="#0038A8"
+            android:pathData="M-4,84 L48,84 L48,100 L-4,100 Z" />
+    </group>
+
+    <!-- Note stem -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M40,76 L40,28 L52,24 L52,72 Z" />
+
+    <!-- Note beam -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M52,24 C68,28 80,36 88,52 C82,40 68,36 52,40 Z" />
+</vector>

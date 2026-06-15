@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="vantablack">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#888888</color>
+    <color name="accent">#FFFFFF</color>
+    <color name="now_playing_blue">#2979FF</color>
+    <color name="divider">#1A1A1A</color>
+    <color name="surface">#0A0A0A</color>
+    <color name="surface_elevated">#141414</color>
+    <color name="progress_track">#333333</color>
+    <color name="paraguay_red">#D52B1E</color>
+    <color name="paraguay_blue">#0038A8</color>
+    <color name="paraguay_white">#FFFFFF</color>
+    <color name="transparent">#00000000</color>
+</resources>

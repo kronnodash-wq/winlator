@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/song_eliminar" android:title="@string/eliminar" />
+    <item android:id="@+id/song_compartir" android:title="@string/compartir" />
+    <item android:id="@+id/song_definir" android:title="@string/definir_como">
+        <menu>
+            <item android:id="@+id/song_tono" android:title="@string/tono" />
+            <item android:id="@+id/song_alarma" android:title="@string/alarma" />
+        </menu>
+    </item>
+</menu>
