@@ -35,14 +35,10 @@ android {
         }
     }
 
-    // Fix: some .so files (e.g. libFLAC.so) appear in both jniLibs and
-    // CMake IMPORTED targets — tell the packager to take the first one found.
+    // All 24 .so files in jniLibs also appear in CMake IMPORTED targets.
+    // A single wildcard rule avoids adding them one by one.
     packagingOptions {
-        pickFirst '**/libFLAC.so'
-        pickFirst '**/libFLAC++.so'
-        pickFirst '**/libogg.so'
-        pickFirst '**/libvorbis.so'
-        pickFirst '**/libvorbisfile.so'
+        pickFirst 'lib/**/*.so'
     }
 }
 
