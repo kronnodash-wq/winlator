@@ -44,6 +44,10 @@ class MainActivity : AppCompatActivity() {
         if (granted) showLibrary()
     }
 
+    private val notifPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { /* result ignored; playback works regardless */ }
+
     /** Handles notification button taps. */
     private val notifReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -92,7 +96,7 @@ class MainActivity : AppCompatActivity() {
             ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
             != PackageManager.PERMISSION_GRANTED
         ) {
-            registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
+            notifPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }
 
