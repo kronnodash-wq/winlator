@@ -54,7 +54,9 @@ class QueueFragment : Fragment() {
             override fun onStopTrackingTouch(s: SeekBar?) {
                 userSeeking = false
                 val dur = BionicPlayer.durationMs
-                if (dur > 0) BionicPlayer.seekTo((s!!.progress.toLong() * dur) / 1000)
+                if (dur > 0 && s != null) {
+                    BionicPlayer.seekTo((s.progress.toLong() * dur) / 1000)
+                }
             }
         })
 
@@ -65,19 +67,21 @@ class QueueFragment : Fragment() {
     private fun observe() {
         viewLifecycleOwner.lifecycleScope.launch {
             BionicPlayer.queue.collect { list ->
+                if (_binding == null) return@collect
                 adapter.submitList(list)
                 updateCounter()
             }
         }
         viewLifecycleOwner.lifecycleScope.launch {
             BionicPlayer.currentIndex.collect {
+                if (_binding == null) return@collect
                 adapter.highlightMediaId = BionicPlayer.current?.mediaId
                 updateCounter()
             }
         }
         viewLifecycleOwner.lifecycleScope.launch {
             BionicPlayer.isPlaying.collect { playing ->
-                binding.queuePlay.setImageResource(
+                _binding?.queuePlay?.setImageResource(
                     if (playing) R.drawable.ic_pause else R.drawable.ic_play
                 )
             }
@@ -85,18 +89,22 @@ class QueueFragment : Fragment() {
     }
 
     private fun updateCounter() {
+        val b = _binding ?: return
         val total = BionicPlayer.queue.value.size
         val pos = BionicPlayer.currentIndex.value + 1
-        binding.queueCounter.text = "$pos/$total"
+        b.queueCounter.text = "$pos/$total"
     }
 
     private fun startProgressLoop() {
         viewLifecycleOwner.lifecycleScope.launch {
             while (true) {
-                val dur = BionicPlayer.durationMs
-                val posMs = BionicPlayer.positionMs
-                if (!userSeeking && dur > 0) {
-                    binding.queueSeekbar.progress = ((posMs * 1000) / dur).toInt()
+                val b = _binding
+                if (b != null) {
+                    val dur = BionicPlayer.durationMs
+                    val posMs = BionicPlayer.positionMs
+                    if (!userSeeking && dur > 0) {
+                        b.queueSeekbar.progress = ((posMs * 1000) / dur).toInt()
+                    }
                 }
                 delay(500)
             }

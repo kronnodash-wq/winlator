@@ -34,13 +34,22 @@ class BionicMediaNotificationProvider(
         actionFactory: MediaNotification.ActionFactory,
         onNotificationChangedCallback: MediaNotification.Provider.Callback
     ): MediaNotification {
-        val song: Song? = BionicPlayer.current
-        val isPlaying = mediaSession.player.playWhenReady &&
-            mediaSession.player.playbackState != Player.STATE_IDLE
+        val notification: Notification = try {
+            val song: Song? = BionicPlayer.current
+            val isPlaying = try {
+                mediaSession.player.playWhenReady &&
+                    mediaSession.player.playbackState != Player.STATE_IDLE
+            } catch (_: Exception) { false }
 
-        val notification: Notification = if (song != null) {
-            builder.build(song, isPlaying, null)
-        } else {
+            if (song != null) {
+                builder.build(song, isPlaying, null)
+            } else {
+                NotificationCompat.Builder(context, App.CHANNEL_PLAYBACK)
+                    .setSmallIcon(R.drawable.ic_notification)
+                    .setContentTitle(context.getString(R.string.app_name))
+                    .build()
+            }
+        } catch (_: Exception) {
             NotificationCompat.Builder(context, App.CHANNEL_PLAYBACK)
                 .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle(context.getString(R.string.app_name))

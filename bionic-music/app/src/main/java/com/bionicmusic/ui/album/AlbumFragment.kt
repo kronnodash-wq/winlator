@@ -46,16 +46,22 @@ class AlbumFragment : Fragment() {
         val countText = getString(R.string.songs_count, songs.size)
         binding.albumInfo.text = if (year != null) "$countText · $year" else countText
 
-        songs.firstOrNull()?.let {
-            Glide.with(this)
-                .load(it.albumArtUri)
-                .placeholder(R.drawable.ic_album_placeholder)
-                .error(R.drawable.ic_album_placeholder)
-                .into(binding.albumArt)
+        songs.firstOrNull()?.let { song ->
+            if (isAdded && !isDetached) {
+                Glide.with(this)
+                    .load(song.albumArtUri)
+                    .placeholder(R.drawable.ic_album_placeholder)
+                    .error(R.drawable.ic_album_placeholder)
+                    .into(binding.albumArt)
+            }
         }
 
         val adapter = SongAdapter(
-            onClick = { pos -> BionicPlayer.setQueue(requireContext(), songs, pos) },
+            onClick = { pos ->
+                if (isAdded && !isDetached) {
+                    BionicPlayer.setQueue(requireContext(), songs, pos)
+                }
+            },
             onMenu = { _, _ -> }
         )
         binding.recyclerAlbumSongs.layoutManager = LinearLayoutManager(requireContext())

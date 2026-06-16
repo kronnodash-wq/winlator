@@ -12,6 +12,10 @@ import kotlinx.coroutines.withContext
 object MusicScanner {
 
     suspend fun scan(context: Context): List<Song> = withContext(Dispatchers.IO) {
+        try { scanInternal(context) } catch (_: Exception) { emptyList() }
+    }
+
+    private fun scanInternal(context: Context): List<Song> {
         val songs = ArrayList<Song>()
         val collection = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
         val projection = arrayOf(

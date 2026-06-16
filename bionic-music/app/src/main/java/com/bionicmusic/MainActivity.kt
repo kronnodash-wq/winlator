@@ -26,7 +26,6 @@ import com.bionicmusic.notification.MusicNotificationManager
 import com.bionicmusic.player.BionicPlayer
 import com.bionicmusic.service.MusicService
 import com.bionicmusic.ui.library.LibraryFragment
-import com.bionicmusic.ui.online.OnlineFragment
 import com.bionicmusic.ui.player.PlayerFragment
 import com.bionicmusic.util.ColorExtractor
 import com.bumptech.glide.Glide
@@ -107,8 +106,6 @@ class MainActivity : AppCompatActivity() {
             replaceFragment(LibraryFragment(), addToBackStack = false)
         }
     }
-
-    fun openOnline() = replaceFragment(OnlineFragment(), addToBackStack = true)
 
     fun replaceFragment(fragment: Fragment, addToBackStack: Boolean) {
         if (isFinishing || isDestroyed) return

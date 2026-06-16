@@ -14,33 +14,6 @@
         app:title="@string/app_name"
         app:titleTextColor="@color/white" />
 
-    <!-- Action bar (shuffle + play all) -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:gravity="center_vertical|end"
-        android:orientation="horizontal"
-        android:paddingEnd="@dimen/spacing_sm">
-
-        <ImageButton
-            android:id="@+id/btn_shuffle"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/shuffle"
-            android:src="@drawable/ic_shuffle"
-            app:tint="@color/white" />
-
-        <ImageButton
-            android:id="@+id/btn_play_all"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/play_all"
-            android:src="@drawable/ic_play"
-            app:tint="@color/white" />
-    </LinearLayout>
-
     <!-- List + fast scroll index -->
     <FrameLayout
         android:layout_width="match_parent"

@@ -54,13 +54,15 @@ class PlayerFragment : Fragment() {
             override fun onStopTrackingTouch(s: SeekBar?) {
                 userSeeking = false
                 val dur = BionicPlayer.durationMs
-                if (dur > 0) BionicPlayer.seekTo((s!!.progress.toLong() * dur) / 1000)
+                if (dur > 0 && s != null) {
+                    BionicPlayer.seekTo((s.progress.toLong() * dur) / 1000)
+                }
             }
         })
     }
 
     private fun openQueue() {
-        if (!isAdded || activity?.isFinishing == true || activity?.isDestroyed == true) return
+        if (!isAdded || isDetached || activity?.isFinishing == true || activity?.isDestroyed == true) return
         childFragmentManager.beginTransaction()
             .setCustomAnimations(R.anim.slide_in_right, 0, 0, R.anim.slide_out_right)
             .add(R.id.player_root, QueueFragment(), "queue")
@@ -87,11 +89,13 @@ class PlayerFragment : Fragment() {
         val song = BionicPlayer.current ?: return
         b.playerTitle.text = song.title
         b.playerArtist.text = song.artist
-        Glide.with(this)
-            .load(song.albumArtUri)
-            .placeholder(R.drawable.ic_album_placeholder)
-            .error(R.drawable.ic_album_placeholder)
-            .into(b.playerArt)
+        if (isAdded && !isDetached) {
+            Glide.with(this)
+                .load(song.albumArtUri)
+                .placeholder(R.drawable.ic_album_placeholder)
+                .error(R.drawable.ic_album_placeholder)
+                .into(b.playerArt)
+        }
     }
 
     private fun startProgressLoop() {
