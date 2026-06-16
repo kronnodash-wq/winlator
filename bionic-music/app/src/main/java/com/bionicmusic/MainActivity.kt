@@ -111,6 +111,7 @@ class MainActivity : AppCompatActivity() {
     fun openOnline() = replaceFragment(OnlineFragment(), addToBackStack = true)
 
     fun replaceFragment(fragment: Fragment, addToBackStack: Boolean) {
+        if (isFinishing || isDestroyed) return
         supportFragmentManager.beginTransaction()
             .setCustomAnimations(
                 R.anim.slide_in_right, R.anim.slide_out_left,
@@ -118,7 +119,7 @@ class MainActivity : AppCompatActivity() {
             )
             .replace(R.id.fragment_container, fragment)
             .apply { if (addToBackStack) addToBackStack(null) }
-            .commit()
+            .commitAllowingStateLoss()
     }
 
     fun launchEqualizer() {
@@ -183,19 +184,23 @@ class MainActivity : AppCompatActivity() {
 
     fun openPlayer(openQueue: Boolean = false) {
         if (BionicPlayer.current == null) return
+        if (isFinishing || isDestroyed) return
         binding.playerContainer.visibility = View.VISIBLE
         supportFragmentManager.beginTransaction()
             .replace(R.id.player_container, PlayerFragment.newInstance(openQueue))
-            .commit()
+            .commitAllowingStateLoss()
         springIn(binding.playerContainer)
         playerVisible = true
     }
 
     fun closePlayer() {
+        if (isFinishing || isDestroyed) return
         springOut(binding.playerContainer) {
             binding.playerContainer.visibility = View.GONE
             supportFragmentManager.findFragmentById(R.id.player_container)?.let {
-                supportFragmentManager.beginTransaction().remove(it).commit()
+                if (!isFinishing && !isDestroyed) {
+                    supportFragmentManager.beginTransaction().remove(it).commitAllowingStateLoss()
+                }
             }
         }
         playerVisible = false

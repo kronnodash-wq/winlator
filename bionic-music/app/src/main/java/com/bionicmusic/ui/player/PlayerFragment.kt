@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.PopupMenu
 import android.widget.SeekBar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -45,12 +44,9 @@ class PlayerFragment : Fragment() {
         binding.ctrlPlay.setOnClickListener { BionicPlayer.playPause() }
         binding.ctrlNext.setOnClickListener { BionicPlayer.next() }
         binding.ctrlPrev.setOnClickListener { BionicPlayer.prev() }
-        binding.ctrlShuffle.setOnClickListener { BionicPlayer.toggleShuffle() }
-        binding.btnMute.setOnClickListener { BionicPlayer.toggleMute() }
         binding.btnEq.setOnClickListener { (activity as? MainActivity)?.launchEqualizer() }
         binding.btnQueue.setOnClickListener { openQueue() }
         binding.ctrlLyrics.setOnClickListener { openQueue() }
-        binding.btnMenu.setOnClickListener { showMenu(it) }
 
         binding.seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(s: SeekBar?, p: Int, fromUser: Boolean) {}
@@ -64,17 +60,18 @@ class PlayerFragment : Fragment() {
     }
 
     private fun openQueue() {
+        if (!isAdded || activity?.isFinishing == true || activity?.isDestroyed == true) return
         childFragmentManager.beginTransaction()
             .setCustomAnimations(R.anim.slide_in_right, 0, 0, R.anim.slide_out_right)
             .add(R.id.player_root, QueueFragment(), "queue")
             .addToBackStack("queue")
-            .commit()
+            .commitAllowingStateLoss()
     }
 
     private fun observe() {
         viewLifecycleOwner.lifecycleScope.launch {
             BionicPlayer.isPlaying.collect { playing ->
-                binding.ctrlPlay.setImageResource(
+                _binding?.ctrlPlay?.setImageResource(
                     if (playing) R.drawable.ic_pause else R.drawable.ic_play
                 )
             }
@@ -86,38 +83,32 @@ class PlayerFragment : Fragment() {
     }
 
     private fun bindSong() {
+        val b = _binding ?: return
         val song = BionicPlayer.current ?: return
-        binding.playerTitle.text = song.title
-        binding.playerArtist.text = song.artist
+        b.playerTitle.text = song.title
+        b.playerArtist.text = song.artist
         Glide.with(this)
             .load(song.albumArtUri)
             .placeholder(R.drawable.ic_album_placeholder)
             .error(R.drawable.ic_album_placeholder)
-            .into(binding.playerArt)
+            .into(b.playerArt)
     }
 
     private fun startProgressLoop() {
         viewLifecycleOwner.lifecycleScope.launch {
             while (true) {
-                val dur = BionicPlayer.durationMs
-                val pos = BionicPlayer.positionMs
-                if (!userSeeking && dur > 0) {
-                    binding.seekbar.progress = ((pos * 1000) / dur).toInt()
+                val b = _binding
+                if (b != null) {
+                    val dur = BionicPlayer.durationMs
+                    val pos = BionicPlayer.positionMs
+                    if (!userSeeking && dur > 0) {
+                        b.seekbar.progress = ((pos * 1000) / dur).toInt()
+                    }
+                    b.timeCurrent.text = formatTime(pos)
+                    b.timeTotal.text = formatTime(dur)
                 }
-                binding.timeCurrent.text = formatTime(pos)
-                binding.timeTotal.text = formatTime(dur)
                 delay(500)
             }
-        }
-    }
-
-    private fun showMenu(anchor: View) {
-        PopupMenu(requireContext(), anchor).apply {
-            menu.add(R.string.ecualizador)
-            setOnMenuItemClickListener {
-                (activity as? MainActivity)?.launchEqualizer(); true
-            }
-            show()
         }
     }
 

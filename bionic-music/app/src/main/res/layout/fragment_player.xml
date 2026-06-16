@@ -31,30 +31,12 @@
             android:layout_weight="1" />
 
         <ImageButton
-            android:id="@+id/btn_mute"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/cd_mute"
-            android:src="@drawable/ic_volume_mute"
-            app:tint="@color/white" />
-
-        <ImageButton
             android:id="@+id/btn_eq"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/cd_eq"
             android:src="@drawable/ic_equalizer_bars"
-            app:tint="@color/white" />
-
-        <ImageButton
-            android:id="@+id/btn_menu"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/cd_menu"
-            android:src="@drawable/ic_more_vert"
             app:tint="@color/white" />
     </LinearLayout>
 
@@ -156,16 +138,6 @@
         android:layout_marginBottom="@dimen/spacing_lg"
         android:gravity="center_vertical"
         android:orientation="horizontal">
-
-        <ImageButton
-            android:id="@+id/ctrl_shuffle"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/cd_shuffle"
-            android:src="@drawable/ic_shuffle"
-            app:tint="@color/white" />
 
         <ImageButton
             android:id="@+id/ctrl_prev"

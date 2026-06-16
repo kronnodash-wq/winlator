@@ -13,8 +13,6 @@
         app:showAsAction="always">
         <menu>
             <item android:id="@+id/action_online" android:title="@string/modo_online" />
-            <item android:id="@+id/action_offline" android:title="@string/modo_offline" />
-            <item android:id="@+id/action_eq" android:title="@string/ecualizador" />
         </menu>
     </item>
 </menu>

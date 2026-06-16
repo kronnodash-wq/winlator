@@ -5,8 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -39,7 +41,6 @@ class LibraryFragment : Fragment() {
         setupToolbar()
         setupRecycler()
         setupSortBar()
-        setupFastScroll()
         loadSongs()
         observePlaying()
     }
@@ -47,8 +48,10 @@ class LibraryFragment : Fragment() {
     private fun setupToolbar() {
         binding.toolbar.inflateMenu(R.menu.menu_main)
         val searchItem = binding.toolbar.menu.findItem(R.id.action_search)
-        (searchItem.actionView as? SearchView)?.apply {
+        val searchView = searchItem?.actionView as? SearchView
+        searchView?.apply {
             queryHint = getString(R.string.search_hint)
+            isIconifiedByDefault = true
             setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String?) = false
                 override fun onQueryTextChange(newText: String?): Boolean {
@@ -57,11 +60,28 @@ class LibraryFragment : Fragment() {
                 }
             })
         }
+        // When the search icon is tapped, expand the SearchView and show the keyboard
+        searchItem?.setOnMenuItemClickListener {
+            searchItem.expandActionView()
+            searchView?.requestFocus()
+            val imm = requireContext().getSystemService<InputMethodManager>()
+            searchView?.post {
+                imm?.showSoftInput(searchView.findFocus(), InputMethodManager.SHOW_IMPLICIT)
+            }
+            true
+        }
         binding.toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
+                R.id.action_search -> {
+                    searchItem.expandActionView()
+                    searchView?.requestFocus()
+                    val imm = requireContext().getSystemService<InputMethodManager>()
+                    searchView?.post {
+                        imm?.showSoftInput(searchView.findFocus(), InputMethodManager.SHOW_IMPLICIT)
+                    }
+                    true
+                }
                 R.id.action_online -> { (activity as? MainActivity)?.openOnline(); true }
-                R.id.action_offline -> { loadSongs(); true }
-                R.id.action_eq -> { (activity as? MainActivity)?.launchEqualizer(); true }
                 else -> false
             }
         }
@@ -82,22 +102,6 @@ class LibraryFragment : Fragment() {
             if (shownSongs.isNotEmpty()) {
                 playFrom((shownSongs.indices).random())
                 BionicPlayer.player()?.shuffleModeEnabled = true
-            }
-        }
-        binding.sortIcon.setOnClickListener { sortByName() }
-        binding.sortLabel.setOnClickListener { sortByName() }
-    }
-
-    private fun setupFastScroll() {
-        binding.fastScroll.onLetterSelected = { letter ->
-            val index = shownSongs.indexOfFirst {
-                val first = it.title.firstOrNull()?.uppercaseChar()
-                if (letter == '#') first == null || !first.isLetter()
-                else first == letter
-            }
-            if (index >= 0) {
-                (binding.recyclerSongs.layoutManager as LinearLayoutManager)
-                    .scrollToPositionWithOffset(index, 0)
             }
         }
     }
@@ -134,9 +138,11 @@ class LibraryFragment : Fragment() {
     }
 
     private fun observePlaying() {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             BionicPlayer.currentIndex.collect {
-                adapter.highlightMediaId = BionicPlayer.current?.mediaId
+                if (_binding != null) {
+                    adapter.highlightMediaId = BionicPlayer.current?.mediaId
+                }
             }
         }
     }
