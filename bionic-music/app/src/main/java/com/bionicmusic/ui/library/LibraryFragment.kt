@@ -9,11 +9,13 @@ import android.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bionicmusic.MainActivity
 import com.bionicmusic.R
 import com.bionicmusic.data.local.MusicScanner
 import com.bionicmusic.data.model.Song
 import com.bionicmusic.databinding.FragmentLibraryBinding
 import com.bionicmusic.player.BionicPlayer
+import com.bionicmusic.ui.online.OnlineFragment
 import kotlinx.coroutines.launch
 
 class LibraryFragment : Fragment() {
@@ -35,8 +37,24 @@ class LibraryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecycler()
+        setupToolbarMenu()
         loadSongs()
         observePlaying()
+    }
+
+    private fun setupToolbarMenu() {
+        binding.toolbar.inflateMenu(R.menu.menu_main)
+        binding.toolbar.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_online -> { openOnline(); true }
+                else -> false
+            }
+        }
+    }
+
+    private fun openOnline() {
+        if (!isAdded) return
+        (activity as? MainActivity)?.replaceFragment(OnlineFragment(), addToBackStack = true)
     }
 
     private fun setupRecycler() {
