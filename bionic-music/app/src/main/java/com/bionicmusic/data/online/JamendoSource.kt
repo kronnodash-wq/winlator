@@ -45,10 +45,11 @@ object JamendoSource : OnlineSource {
         result
     }
 
-    override suspend fun resolveUrl(song: OnlineSong, format: AudioFormat): String? {
-        return when (format) {
-            AudioFormat.FLAC -> song.flacUrl ?: song.streamUrl
-            AudioFormat.MP3 -> song.streamUrl
+    override suspend fun resolveUrl(song: OnlineSong, format: AudioFormat): String? =
+        withContext(Dispatchers.IO) {
+            when (format) {
+                AudioFormat.FLAC -> song.flacUrl ?: song.streamUrl
+                AudioFormat.MP3 -> song.streamUrl
+            }
         }
-    }
 }

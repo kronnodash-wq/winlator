@@ -12,42 +12,95 @@ object SoundCloudSource : OnlineSource {
 
     private const val BASE = "https://api-v2.soundcloud.com"
 
-    // SoundCloud's own web client uses this client_id; refresh dynamically if stale.
-    @Volatile private var clientId = "iZIs9mchVcX5lhVRyQGGAYlNPVldzAoX"
+    // Known public client_ids used by SoundCloud's own web client (tried in order).
+    private val KNOWN_IDS = listOf(
+        "iZIs9mchVcX5lhVRyQGGAYlNPVldzAoX",
+        "a3e059563d7fd3372b49b37f00a00bcf",
+        "2t9loNQH90kzJcsFCODdigxfp325aq4z",
+        "XsONPOTSoTzFG4bImBSzEMCP2LmxmKoO"
+    )
 
-    private fun isStale(body: String) =
-        "401" in body && ("Invalid client_id" in body || "\"error\"" in body)
+    @Volatile private var clientId: String = KNOWN_IDS[0]
+    @Volatile private var ready: Boolean = false
 
-    /** Scrapes SoundCloud's homepage JS files to extract a fresh client_id. */
-    private fun refreshClientId(): Boolean {
-        val html = Http.get("https://soundcloud.com") ?: return false
-        val scriptUrls = Regex("""<script[^>]+src="(https://a-v2\.sndcdn\.com/assets/[^"]+\.js)"""")
-            .findAll(html).map { it.groupValues[1] }.take(8).toList()
+    /**
+     * Scrapes SoundCloud's homepage JS bundles to find the active client_id.
+     * SoundCloud embeds it in minified JS as client_id:"<id>" or client_id="<id>".
+     */
+    @Synchronized
+    private fun scrapeClientId(): String? {
+        val html = Http.get("https://soundcloud.com") ?: return null
+        val scriptUrls = Regex(
+            """<script[^>]+src="(https://a-v2\.sndcdn\.com/assets/[^"]+\.js)""""
+        ).findAll(html).map { it.groupValues[1] }.take(12).toList()
+
+        val patterns = listOf(
+            Regex("""[,{(\s]client_id[=:"]{1,2}([a-zA-Z0-9]{20,60})[,"'\s}]"""),
+            Regex("""client_id:"([a-zA-Z0-9]{20,60})""""),
+            Regex("""client_id=([a-zA-Z0-9]{20,60})[&,\s]""")
+        )
         for (url in scriptUrls) {
             val js = Http.get(url) ?: continue
-            val match = Regex("""client_id[=:"]+([a-zA-Z0-9]{20,50})""").find(js) ?: continue
-            clientId = match.groupValues[1]
-            return true
+            for (pattern in patterns) {
+                val m = pattern.find(js) ?: continue
+                val id = m.groupValues[1]
+                if (id.length in 20..60) return id
+            }
         }
-        return false
+        return null
+    }
+
+    /** Initializes client_id on first use: tries JS scraping then falls back to known IDs. */
+    @Synchronized
+    private fun ensureReady() {
+        if (ready) return
+        val scraped = scrapeClientId()
+        if (scraped != null) {
+            clientId = scraped
+            ready = true
+            return
+        }
+        // Scraping failed — try each known ID with a lightweight probe
+        for (id in KNOWN_IDS) {
+            val probe = Http.get("$BASE/resolve?url=https://soundcloud.com&client_id=$id")
+            if (probe != null) {
+                clientId = id
+                ready = true
+                return
+            }
+        }
+        // Last resort: use the first known ID and hope for the best
+        clientId = KNOWN_IDS[0]
+        ready = true
+    }
+
+    /** Forces a re-scrape on next use (called after a failed request). */
+    @Synchronized
+    private fun invalidate() {
+        ready = false
     }
 
     /**
-     * Fetches [url], retrying once with a freshly extracted client_id if the
-     * response signals a stale/invalid client_id (HTTP 401).
+     * Makes a GET request using the current client_id. If it returns null
+     * (network error or 401), invalidates the cached ID and retries once with
+     * a freshly scraped one.
      */
-    private fun fetch(url: String): String? {
-        val body = Http.get(url)
-        if (body != null && !isStale(body)) return body
-        if (!refreshClientId()) return null
-        val retryUrl = url.replace(Regex("client_id=[^&]+"), "client_id=$clientId")
-        val retryBody = Http.get(retryUrl) ?: return null
-        return if (isStale(retryBody)) null else retryBody
+    private fun scGet(url: String): String? {
+        ensureReady()
+        val first = Http.get(url)
+        if (first != null) return first
+
+        // First attempt failed — refresh and retry
+        invalidate()
+        ensureReady()
+        val retried = url.replace(Regex("""client_id=[^&]+"""), "client_id=$clientId")
+        return Http.get(retried)
     }
 
     override suspend fun search(query: String): List<OnlineSong> = withContext(Dispatchers.IO) {
+        ensureReady()
         val q = URLEncoder.encode(query, "UTF-8")
-        val body = fetch("$BASE/search/tracks?q=$q&client_id=$clientId&limit=25")
+        val body = scGet("$BASE/search/tracks?q=$q&client_id=$clientId&limit=25")
             ?: return@withContext emptyList()
         try {
             val collection = JSONObject(body).optJSONArray("collection")
@@ -64,7 +117,7 @@ object SoundCloudSource : OnlineSource {
                 val artwork = track.optString("artwork_url").ifEmpty { null }
                     ?.replace("-large.", "-t500x500.")
 
-                // Prefer progressive (direct file) over HLS for easier download/seek
+                // Prefer progressive (direct MP3 file) over HLS for easier download & seek
                 val transcodings = track.optJSONObject("media")?.optJSONArray("transcodings")
                 var progressiveUrl: String? = null
                 var hlsUrl: String? = null
@@ -91,6 +144,7 @@ object SoundCloudSource : OnlineSource {
                         thumbnailUrl = artwork,
                         source = OnlineSourceType.SOUNDCLOUD,
                         streamUrl = streamEndpoint
+                        // flacUrl left null — SoundCloud only provides MP3
                     )
                 )
             }
@@ -101,13 +155,13 @@ object SoundCloudSource : OnlineSource {
     }
 
     /**
-     * Resolves the transcoding endpoint stored in [song.streamUrl] to the
-     * actual CDN URL needed by ExoPlayer and the downloader.
+     * Resolves the transcoding endpoint in [song.streamUrl] to the actual CDN
+     * URL. SoundCloud only provides MP3; FLAC format falls back to MP3 as well.
      */
     override suspend fun resolveUrl(song: OnlineSong, format: AudioFormat): String? =
         withContext(Dispatchers.IO) {
             val endpoint = song.streamUrl ?: return@withContext null
-            val body = fetch("$endpoint?client_id=$clientId") ?: return@withContext null
+            val body = scGet("$endpoint?client_id=$clientId") ?: return@withContext null
             try {
                 JSONObject(body).optString("url").ifEmpty { null }
             } catch (_: Exception) {
