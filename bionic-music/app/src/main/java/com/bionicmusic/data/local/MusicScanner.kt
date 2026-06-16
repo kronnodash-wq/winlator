@@ -63,6 +63,6 @@ object MusicScanner {
                 )
             }
         }
-        songs
+        return songs
     }
 }
