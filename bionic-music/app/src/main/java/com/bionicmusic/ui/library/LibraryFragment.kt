@@ -51,7 +51,7 @@ class LibraryFragment : Fragment() {
         val searchView = searchItem?.actionView as? SearchView
         searchView?.apply {
             queryHint = getString(R.string.search_hint)
-            isIconifiedByDefault = true
+            setIconifiedByDefault(false)
             setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String?) = false
                 override fun onQueryTextChange(newText: String?): Boolean {
