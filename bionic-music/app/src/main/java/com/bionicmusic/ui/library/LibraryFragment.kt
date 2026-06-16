@@ -51,7 +51,7 @@ class LibraryFragment : Fragment() {
         val searchView = searchItem?.actionView as? SearchView
         searchView?.apply {
             queryHint = getString(R.string.search_hint)
-            setIconifiedByDefault(false)
+            setIconifiedByDefault(true)
             setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String?) = false
                 override fun onQueryTextChange(newText: String?): Boolean {
@@ -59,25 +59,23 @@ class LibraryFragment : Fragment() {
                     return true
                 }
             })
-        }
-        // When the search icon is tapped, expand the SearchView and show the keyboard
-        searchItem?.setOnMenuItemClickListener {
-            searchItem.expandActionView()
-            searchView?.requestFocus()
-            val imm = requireContext().getSystemService<InputMethodManager>()
-            searchView?.post {
-                imm?.showSoftInput(searchView.findFocus(), InputMethodManager.SHOW_IMPLICIT)
+            // When SearchView collapses, reset the list
+            setOnCloseListener {
+                filter("")
+                false
             }
-            true
         }
         binding.toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.action_search -> {
-                    searchItem.expandActionView()
+                    searchItem?.expandActionView()
                     searchView?.requestFocus()
                     val imm = requireContext().getSystemService<InputMethodManager>()
                     searchView?.post {
-                        imm?.showSoftInput(searchView.findFocus(), InputMethodManager.SHOW_IMPLICIT)
+                        imm?.showSoftInput(
+                            searchView.findFocus() ?: searchView,
+                            InputMethodManager.SHOW_IMPLICIT
+                        )
                     }
                     true
                 }

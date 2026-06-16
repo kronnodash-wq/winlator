@@ -8,59 +8,73 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.net.URLEncoder
 
-/**
- * Piped (YouTube proxy) source. No auth required.
- */
 object PipedSource : OnlineSource {
 
-    private const val BASE = "https://pipedapi.kavin.rocks"
+    // Multiple public Piped instances — tries each until one works
+    private val INSTANCES = listOf(
+        "https://pipedapi.kavin.rocks",
+        "https://piped-api.privacy.com.de",
+        "https://api.piped.projectsegfau.lt",
+        "https://pipedapi.syncpundit.io"
+    )
 
     override suspend fun search(query: String): List<OnlineSong> = withContext(Dispatchers.IO) {
         val q = URLEncoder.encode(query, "UTF-8")
-        val body = Http.get("$BASE/search?q=$q&filter=music_songs") ?: return@withContext emptyList()
-        val result = ArrayList<OnlineSong>()
-        try {
-            val items = JSONObject(body).optJSONArray("items") ?: return@withContext emptyList()
-            for (i in 0 until items.length()) {
-                val o = items.optJSONObject(i) ?: continue
-                val url = o.optString("url") // /watch?v=ID
-                val videoId = url.substringAfter("v=", "").substringBefore("&")
-                if (videoId.isEmpty()) continue
-                result.add(
-                    OnlineSong(
-                        id = videoId,
-                        title = o.optString("title").ifEmpty { "Unknown" },
-                        artist = o.optString("uploaderName").ifEmpty { "Unknown" },
-                        durationSec = o.optInt("duration", 0),
-                        thumbnailUrl = o.optString("thumbnail").ifEmpty { null },
-                        source = OnlineSourceType.PIPED
+        for (base in INSTANCES) {
+            val body = Http.get("$base/search?q=$q&filter=all") ?: continue
+            try {
+                val items = JSONObject(body).optJSONArray("items") ?: continue
+                val result = ArrayList<OnlineSong>()
+                for (i in 0 until items.length()) {
+                    val o = items.optJSONObject(i) ?: continue
+                    // Only include audio/music-like items (type "stream" or no type)
+                    val type = o.optString("type")
+                    if (type == "channel" || type == "playlist") continue
+                    val url = o.optString("url")
+                    val videoId = url.substringAfter("v=", "").substringBefore("&")
+                        .takeIf { it.isNotEmpty() }
+                        ?: o.optString("videoId").takeIf { it.isNotEmpty() }
+                        ?: continue
+                    result.add(
+                        OnlineSong(
+                            id = videoId,
+                            title = o.optString("title").ifEmpty { "Unknown" },
+                            artist = o.optString("uploaderName").ifEmpty { "Unknown" },
+                            durationSec = o.optInt("duration", 0),
+                            thumbnailUrl = o.optString("thumbnail").ifEmpty { null },
+                            source = OnlineSourceType.PIPED
+                        )
                     )
-                )
+                }
+                if (result.isNotEmpty()) return@withContext result
+            } catch (_: Exception) {
+                continue
             }
-        } catch (_: Exception) {
         }
-        result
+        emptyList()
     }
 
     override suspend fun resolveUrl(song: OnlineSong, format: AudioFormat): String? =
         withContext(Dispatchers.IO) {
-            val body = Http.get("$BASE/streams/${song.id}") ?: return@withContext null
-            try {
-                val audioStreams = JSONObject(body).optJSONArray("audioStreams")
-                    ?: return@withContext null
-                var bestUrl: String? = null
-                var bestBitrate = -1
-                for (i in 0 until audioStreams.length()) {
-                    val s = audioStreams.optJSONObject(i) ?: continue
-                    val bitrate = s.optInt("bitrate", 0)
-                    if (bitrate > bestBitrate) {
-                        bestBitrate = bitrate
-                        bestUrl = s.optString("url").ifEmpty { null }
+            for (base in INSTANCES) {
+                val body = Http.get("$base/streams/${song.id}") ?: continue
+                try {
+                    val audioStreams = JSONObject(body).optJSONArray("audioStreams") ?: continue
+                    var bestUrl: String? = null
+                    var bestBitrate = -1
+                    for (i in 0 until audioStreams.length()) {
+                        val s = audioStreams.optJSONObject(i) ?: continue
+                        val bitrate = s.optInt("bitrate", 0)
+                        if (bitrate > bestBitrate) {
+                            bestBitrate = bitrate
+                            bestUrl = s.optString("url").ifEmpty { null }
+                        }
                     }
+                    if (bestUrl != null) return@withContext bestUrl
+                } catch (_: Exception) {
+                    continue
                 }
-                bestUrl
-            } catch (_: Exception) {
-                null
             }
+            null
         }
 }
