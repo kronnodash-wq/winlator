@@ -7,7 +7,7 @@ import androidx.media3.common.MediaMetadata
 import kotlinx.parcelize.Parcelize
 
 /** Source of an online track. */
-enum class OnlineSourceType { PIPED, JAMENDO, FMA }
+enum class OnlineSourceType { PIPED, JAMENDO, FMA, SOUNDCLOUD }
 
 /** Audio download/stream container format. */
 enum class AudioFormat(val ext: String, val mime: String) {

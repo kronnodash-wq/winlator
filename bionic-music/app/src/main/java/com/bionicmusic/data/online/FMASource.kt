@@ -18,8 +18,8 @@ object FMASource : OnlineSource {
 
 /** Aggregates all online sources, querying them independently so one failure doesn't kill all results. */
 object OnlineRepository {
-    // FMA is disabled (API key required); only Piped and Jamendo are active.
-    private val sources = listOf<OnlineSource>(PipedSource, JamendoSource)
+    // SoundCloud is the primary source; Jamendo provides CC music as a secondary.
+    private val sources = listOf<OnlineSource>(SoundCloudSource, JamendoSource)
 
     suspend fun searchAll(query: String): List<OnlineSong> = withContext(Dispatchers.IO) {
         val all = ArrayList<OnlineSong>()
@@ -34,8 +34,9 @@ object OnlineRepository {
     }
 
     fun sourceFor(song: OnlineSong): OnlineSource = when (song.source) {
-        OnlineSourceType.PIPED -> PipedSource
+        OnlineSourceType.SOUNDCLOUD -> SoundCloudSource
         OnlineSourceType.JAMENDO -> JamendoSource
+        OnlineSourceType.PIPED -> PipedSource
         OnlineSourceType.FMA -> FMASource
     }
 }
