@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Theme.BionicMusic" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorOnPrimary">@color/vantablack</item>
+        <item name="colorSecondary">@color/text_secondary</item>
+        <item name="android:colorBackground">@color/vantablack</item>
+        <item name="colorSurface">@color/vantablack</item>
+        <item name="colorOnSurface">@color/white</item>
+        <item name="android:windowBackground">@color/vantablack</item>
+        <item name="android:statusBarColor">@color/vantablack</item>
+        <item name="android:navigationBarColor">@color/vantablack</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <!-- Force square corners on Material components -->
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.Bionic.Square</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.Bionic.Square</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.Bionic.Square</item>
+    </style>
+
+    <style name="ShapeAppearance.Bionic.Square" parent="">
+        <item name="cornerFamily">cut</item>
+        <item name="cornerSize">0dp</item>
+    </style>
+
+    <style name="Theme.BionicMusic.Splash" parent="Theme.BionicMusic">
+        <item name="android:windowBackground">@color/vantablack</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
+    <!-- Square text appearances -->
+    <style name="TextTitle">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">@dimen/text_title</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextSubtitle">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textSize">@dimen/text_subtitle</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="TextBodyPrimary">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">@dimen/text_body</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="TextBodySecondary">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textSize">@dimen/text_caption</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+</resources>

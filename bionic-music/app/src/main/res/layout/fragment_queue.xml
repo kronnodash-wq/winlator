@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/vantablack"
+    android:orientation="vertical">
+
+    <!-- Top bar: chevron-down only -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/app_bar_height"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/spacing_sm"
+        android:paddingEnd="@dimen/spacing_md">
+
+        <ImageButton
+            android:id="@+id/btn_close_queue"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/cd_close"
+            android:src="@drawable/ic_chevron_down"
+            app:tint="@color/white" />
+
+        <TextView
+            android:id="@+id/queue_title"
+            style="@style/TextBodyPrimary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_sm"
+            android:layout_weight="1"
+            android:text="@string/queue"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <!-- Sort label + counter -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/spacing_md"
+        android:paddingEnd="@dimen/spacing_md">
+
+        <TextView
+            android:id="@+id/queue_sort_label"
+            style="@style/TextBodySecondary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/sort_name" />
+
+        <TextView
+            android:id="@+id/queue_counter"
+            style="@style/TextBodySecondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="1/26" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_queue"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scrollbars="none" />
+
+    <!-- Progress + controls at bottom -->
+    <SeekBar
+        android:id="@+id/queue_seekbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/spacing_md"
+        android:layout_marginEnd="@dimen/spacing_md"
+        android:max="1000"
+        android:progressTint="@color/white"
+        android:progressBackgroundTint="@color/progress_track"
+        android:thumbTint="@color/white" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/spacing_md"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/spacing_md"
+        android:paddingEnd="@dimen/spacing_md">
+
+        <ImageButton
+            android:id="@+id/queue_shuffle"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/cd_shuffle"
+            android:src="@drawable/ic_shuffle"
+            app:tint="@color/white" />
+
+        <ImageButton
+            android:id="@+id/queue_prev"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/cd_prev"
+            android:src="@drawable/ic_prev"
+            app:tint="@color/white" />
+
+        <ImageButton
+            android:id="@+id/queue_play"
+            android:layout_width="@dimen/play_button_size"
+            android:layout_height="@dimen/play_button_size"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/cd_play"
+            android:src="@drawable/ic_play"
+            app:tint="@color/white" />
+
+        <ImageButton
+            android:id="@+id/queue_next"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/cd_next"
+            android:src="@drawable/ic_next"
+            app:tint="@color/white" />
+
+        <ImageButton
+            android:id="@+id/queue_lyrics"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/cd_lyrics"
+            android:src="@drawable/ic_lyrics"
+            app:tint="@color/white" />
+    </LinearLayout>
+</LinearLayout>

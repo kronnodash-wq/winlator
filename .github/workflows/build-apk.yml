@@ -1,0 +1,62 @@
+name: Build Winlator APK — Skullgirls 2nd Encore (Galaxy A56)
+
+on:
+  push:
+    branches:
+      - main
+      - claude/apk-creation-72uiaf
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize app submodule
+        run: git submodule update --init app
+
+      - name: Apply Skullgirls / Galaxy A56 performance patches
+        run: |
+          cp patches/Container.java \
+            app/app/src/main/java/com/winlator/container/Container.java
+          cp patches/Box64Preset.java \
+            app/app/src/main/java/com/winlator/box64/Box64Preset.java
+          cp patches/build.gradle \
+            app/app/build.gradle
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install required SDK components
+        run: |
+          sdkmanager --install \
+            "platforms;android-34" \
+            "build-tools;34.0.0" \
+            "ndk;24.0.8215888" \
+            "cmake;3.22.1"
+
+      - name: Grant gradlew permission
+        run: chmod +x app/gradlew
+
+      - name: Build Debug APK
+        working-directory: app
+        run: ./gradlew assembleDebug --stacktrace
+        env:
+          ANDROID_NDK_HOME: ${{ env.ANDROID_SDK_ROOT }}/ndk/24.0.8215888
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: winlator-skullgirls-galaxy-a56
+          path: app/app/build/outputs/apk/debug/*.apk
+          retention-days: 30

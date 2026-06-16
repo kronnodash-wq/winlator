@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/online_descargar" android:title="@string/descargar_musica" />
+    <item android:id="@+id/online_formato" android:title="@string/formato">
+        <menu>
+            <item android:id="@+id/online_mp3" android:title="@string/formato_mp3" />
+            <item android:id="@+id/online_flac" android:title="@string/formato_flac" />
+        </menu>
+    </item>
+    <item android:id="@+id/online_eliminar" android:title="@string/eliminar" />
+</menu>
